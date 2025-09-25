@@ -29,7 +29,7 @@ a continuous series of Source Images
 # Deployment
 a collection of sessions that starts when a device is left in a location and ends when the device is removed from that location
 
-# Location
+# Sampling Point 
 a very specific spot where a device is deployed (likely has attributes like a GPS coordinate and maybe a description of its exact spot like "left palm tree next to lake" or values like like "height above ground")
 
 # Site
