@@ -33,5 +33,18 @@ a collection of sessions that starts when a device is left in a location and end
 a very specific spot where a device is deployed (likely has attributes like a GPS coordinate and maybe a description of its exact spot like "left palm tree next to lake" or values like like "height above ground")
 
 # Site
-area being surveyed by a device. Might have a gps coordinate and a radius?
+area being surveyed by a device. Might have a gps coordinate and a radius? Automated Insect Monitoring Symposia participants indicated in a poll this is likely a zone 10-100 meters wide
+
+# Protocol
+The method in which a task was carried out. Can be applied to a deployment, session, capture, detection.
+
+# Attractor
+Generic name for the specific stimulus used to lure creatures. Could be chemical, visual, auditory.
+
+
+
+
+# Visual Overview of some terms from Donald Hobern
+![Untitled](https://github.com/user-attachments/assets/d753fdad-41ea-48e8-9fd5-762c5404a9f0)
+
 
