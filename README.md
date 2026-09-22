@@ -11,6 +11,11 @@ Working towards a data standard or data schema for devices that try to image art
 - **Explanation:** Could be an insect, an arthropod, or another small animal.
 - **Example:** gecko, beetle, bat
 
+### Occurrence
+- **Definition:** One Specific creature
+- **Explanation:** an individual creature that occurs in a specific time and place
+- **Example:** Jim the gecko, Sally the beetle, Lee the bat
+
 ### Detection
 - **Definition:** a specific subset from a source file.
 - **Explanation:** ideally contains only one creature.
