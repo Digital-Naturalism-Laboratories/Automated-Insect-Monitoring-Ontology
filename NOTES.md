@@ -20,7 +20,8 @@ A living list. Status moves from “To ask” to “Asked” to the answer.
 ## Open questions
 
 - **How a rotated box is written.** An upright box can be written several ways, and a rotated one has even more. See [Ways to write a box](#ways-to-write-a-box) below. Proposal: always give an upright box that every tool can read, and add the rotated box as four corner points when there is one; treat any angle as a convenience copy, not the record. Not decided yet.
-- **Terms not defined yet:** capture window, morphospecies, non-target label (blur, frass, debris), project vs dataset.
+- **Target or stage.** “Target” (the sheet, tube or flower creatures land on) is still a draft name; “stage” is one alternative.
+- **Project vs dataset.** Andrew is still thinking about whether these are two terms (the body of work and its people, and a portable package of its files) or one.
 
 ## Background
 
@@ -71,6 +72,15 @@ To do once the terms are settled; the Mothbox tools will be conformed to the ont
 - Mothbot Process: write `direction` in X-AnyLabeling's convention (radians) on both detection paths, or derive it from the corners, so hand labels and detector output agree.
 
 ## Log
+
+### 2026-11-03: More definitions
+
+- **Capture window** is redefined as a continuous series of source file captures made while the attractor was running. Tying it to the attractor explains why Mothbox sessions have several windows (the attractor runs on a schedule) and AMI sessions usually one (the attractor runs all night).
+- **Morphospecies:** a group of creatures sharing certain features, judged to be the same type of thing, usually made by a person when the exact designation is not known. Often a placeholder until the official species is found. Other ranks work the same way: morphogenus, morphofamily.
+- **Non-target label:** a label applied to detections we are not interested in, commonly subcategorized as blur, frass, debris, plant material or error.
+- **Creature, Attractor and Deployment** keep their earlier wording and are now decided.
+- **Target** stays a draft; “stage” might be a better name.
+- **Project vs dataset:** still being considered.
 
 ### 2026-11-03: Sessions, capture windows and boxes
 

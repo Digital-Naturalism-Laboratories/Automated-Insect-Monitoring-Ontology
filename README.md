@@ -1,8 +1,6 @@
 # Automated-Insect-Monitoring-Ontology
 Working towards a data standard or data schema for devices that try to image arthropods automatically in nature by creating a shared vocabulary.
 
-> [!NOTE]
-> Nerds who are good at computers and organizing stuff might have better suggestions for formatting this list of terms and definitions. If that's you, please change this however makes sense!
 
 The reasoning behind each decision, the questions still open, and what we want to ask other groups (such as the Antenna / AMI team) are kept in [NOTES.md](NOTES.md).
 
@@ -20,8 +18,8 @@ Each term has a **Status**:
 ## Contents
 
 - [Creatures and records](#creatures-and-records): Creature, Occurrence, Track, Cluster
-- [Evidence and identifications](#evidence-and-identifications): Source File, Detection, Identification, Agree, Determination, Score
-- [Taxonomy](#taxonomy): Taxa List, Species List, Taxon Keys
+- [Evidence and identifications](#evidence-and-identifications): Source File, Detection, Identification, Agree, Determination, Score, Non-target Label
+- [Taxonomy](#taxonomy): Taxa List, Species List, Morphospecies, Taxon Keys
 - [Places and time](#places-and-time): Location, Site, Deployment, Session, Capture Window
 - [Hardware](#hardware): Device, Target, Attractor
 - [Methods](#methods): Protocol
@@ -32,7 +30,7 @@ Each term has a **Status**:
 ### Creatures and records
 
 #### Creature
-- **Status:** Draft
+- **Status:** Decided
 - **Definition:** Abstract term for a living thing that is of interest for this work.
 - **Explanation:** Could be an insect, an arthropod, or another small animal.
 - **Example:** gecko, beetle, bat
@@ -123,6 +121,15 @@ Each term has a **Status**:
 - **Example:** detection score 0.91; identification score 0.62
 - **Also called:** confidence (older Mothbot data: `confidence_detection`, `confidence_ID`); score (Antenna)
 
+#### Non-target Label
+- **Status:** Decided
+- **Definition:** A label applied to a detection we are not interested in.
+- **Explanation:** It marks detections that are not creatures of interest or cannot be used, so they can be left out of counts and identifications without being deleted.
+- **Example:** a blurry detection labelled as blur; a detection of insect droppings labelled as frass
+- **Attributes:**
+    - subcategory, commonly: blur, frass, debris, plant material, error
+- **Also called:** error label (Mothbot Classify, e.g. `ERROR_Blur`); non-moth (Antenna's moth / non-moth classifier)
+
 ### Taxonomy
 
 #### Taxa List
@@ -140,6 +147,15 @@ Each term has a **Status**:
 - **Definition:** A taxa list whose entries are species.
 - **Explanation:** GBIF calls its checklist downloads “species lists”, which is where the Mothbox tools got the name. Use [Taxa List](#taxa-list) as the general term.
 - **Example:** a GBIF species list download for Insecta in Panama
+
+#### Morphospecies
+- **Status:** Decided
+- **Definition:** A group of creatures sharing certain features, judged to be the same type of thing.
+- **Explanation:** Usually made by a person organizing creatures whose exact designations are not known, but which seem to be the same sort of thing. It is often a placeholder until the official species can be found. The same idea works at other ranks, such as a morphogenus or a morphofamily.
+- **Example:** “brown moth with white kidney spot A”, used for every detection of that kind until it is identified to species
+- **Attributes:**
+    - rank it stands in for (morphospecies, morphogenus, morphofamily, ...)
+- **Also called:** morphospecies (Mothbot Classify); unknown species (an unmerged Antenna branch)
 
 #### Taxon Keys
 - **Status:** Decided, pending Antenna
@@ -176,7 +192,7 @@ Each term has a **Status**:
 - **Also called:** Site and Station (Antenna)
 
 #### Deployment
-- **Status:** Draft
+- **Status:** Decided
 - **Definition:** A collection of sessions.
 - **Explanation:** Starts when a device is left in a location and ends when the device is removed from that location.
 - **Example:** A season
@@ -191,8 +207,8 @@ Each term has a **Status**:
 
 #### Capture Window
 - **Status:** Decided
-- **Definition:** A small continuous stretch of capture within a session.
-- **Explanation:** A Mothbox session usually has several capture windows, because the device follows a schedule (by default five stretches of 59 minutes a night). An Antenna session usually has just one, because AMI traps capture continuously. Both fit the same nesting, so the data stays compatible.
+- **Definition:** A continuous series of source file captures made while the attractor was running.
+- **Explanation:** A capture window is an event inside a session. A Mothbox session usually has several capture windows, because the device runs its attractor on a schedule (by default five stretches of 59 minutes a night). An Antenna session usually has just one, because AMI traps run all night. Both fit the same nesting, so the data stays compatible.
 - **Example:** photos taken every minute from 19:00 to 19:59
 - **Attributes:**
     - start and end time
@@ -221,9 +237,10 @@ Each term has a **Status**:
 - **Definition:** The part of a device being directly observed where insects are intended to go for observation.
 - **Explanation:**
 - **Example:** a target sheet, a tube, or an artificial flower.
+- **Note:** The name may change; “stage” is one option being considered.
 
 #### Attractor
-- **Status:** Draft
+- **Status:** Decided
 - **Definition:** specific stimulus used to lure creatures.
 - **Explanation:** This might not be visible/ audible in the Source files.
 - **Example:** chemical (smell), visual (UV, false flowers), or auditory (mating call).
@@ -241,9 +258,5 @@ These might help to describe or distinguish things:
 - appearance
 - localisation
 - record
-- morphospecies (a placeholder name for a distinct kind of creature not yet named)
-- non-target label (a detection that is not a creature or is unusable, such as blur, frass or debris)
-- project and dataset
+- project and dataset (being considered)
 
-## Visual Overview of some terms from Donald Hobern
-![Untitled](https://github.com/user-attachments/assets/d753fdad-41ea-48e8-9fd5-762c5404a9f0)
