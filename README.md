@@ -2,7 +2,7 @@
 Working towards a data standard or data schema for devices that try to image arthropods automatically in nature by creating a shared vocabulary.
 
 
-The reasoning behind each decision, the questions still open, and what we want to ask other groups (such as the Antenna / AMI team) are kept in [NOTES.md](NOTES.md).
+The reasoning behind each decision, the questions still open, and what we want to ask other groups (such as the Antenna / AMI team) are kept in [NOTES.md](NOTES.md). Agendas for meetings with other groups are in [meetings/](meetings/).
 
 ## How to read this glossary
 
@@ -24,6 +24,7 @@ Each term has a **Status**:
 - [Hardware](#hardware): Device, Target, Attractor
 - [Methods](#methods): Protocol
 - [Terms without definition (yet)](#terms-without-definition-yet)
+- [Crosswalk](#crosswalk): the same terms in the Mothbox tools, Antenna, Darwin Core and Camtrap DP
 
 ## Glossary of terms
 
@@ -164,7 +165,7 @@ Each term has a **Status**:
 - **Attributes:**
     - `gbif_taxon_key`: the GBIF Backbone Taxonomy key (a whole number)
     - `col_taxon_key`: the Catalogue of Life key (letters and digits, e.g. `B6L67`), which newer GBIF species list downloads use
-- **Also called:** `gbif_taxon_key` (Antenna); `taxonID` (Mothbot, holding a Catalogue of Life key since October 2026)
+- **Also called:** `gbif_taxon_key` (Antenna, which also stores `bold_taxon_bin` and `inat_taxon_id`, but no Catalogue of Life key); `taxonID` (Mothbot, holding a Catalogue of Life key since October 2026; Darwin Core)
 
 ### Places and time
 
@@ -259,4 +260,40 @@ These might help to describe or distinguish things:
 - localisation
 - record
 - project and dataset (being considered)
+- capture set: a chosen subset of source files (Antenna's “Capture set”)
+- algorithm and pipeline: one model, and a chain of models (Antenna)
 
+
+## Crosswalk
+
+How each term maps onto the names used by the Mothbox tools and Antenna, and onto the fields of the two publishing standards. "—" means there is no equivalent. Antenna often shows a different word on screen from the one in its code, so both are listed. Antenna's names were checked against its `main` branch on 2026-11-19.
+
+| This ontology | Mothbox tools | Antenna (screen) | Antenna (code) | Darwin Core | Camtrap DP |
+|---|---|---|---|---|---|
+| Creature | creature, insect | — | — | — | — |
+| Occurrence | — | Occurrence | `Occurrence` | `occurrenceID`, `organismID` | `individualID` |
+| Track | temporal sub-cluster (older data) | — | sequence (AMI Data Companion) | — | — |
+| Cluster | cluster | — | — | — | — |
+| Source File | source image, raw photo | Capture | `SourceImage` | Audubon Core media record | media (`mediaID`, `filePath`) |
+| Detection | patch, shape, bot / human detection | Detection | `Detection` (`bbox`) | Audubon Core region of interest | observation with `bboxX`, `bboxY`, `bboxWidth`, `bboxHeight` |
+| Identification | classification | Machine prediction / Identification | `Classification` / `Identification` | `identifiedBy`, `dateIdentified` | `classificationMethod`, `classifiedBy`, `classificationTimestamp` |
+| `identifierType` | — | — | which model holds it | — | `classificationMethod` (`human` / `machine`) |
+| Agree | Accept | Agree | `agreed_with_identification`, `agreed_with_prediction` | — | — |
+| Determination | current classification | Determination | `Occurrence.determination` | `scientificName`, `taxonRank` on the occurrence | `scientificName` |
+| Score | `confidence_detection`, `confidence_ID` | Score | `score`, `determination_score` | — | `classificationProbability` |
+| Non-target Label | error label (`ERROR_Blur`, …) | non-moth | moth / non-moth classifier, `Tag` | — | `observationType` (`blank`, `unknown`, `unclassified`) |
+| Taxa List | species list | Taxa list | `TaxaList` | — | `taxonomic` (package metadata) |
+| Morphospecies | morphospecies | — | unknown species (unmerged branch) | `verbatimIdentification` (partly) | — |
+| Taxon Keys | `taxonID` (Catalogue of Life key) | — | `gbif_taxon_key`, `bold_taxon_bin`, `inat_taxon_id` | `taxonID` | `taxonID` |
+| Location | latitude / longitude (field sheet) | Station latitude / longitude | `Deployment.latitude`, `.longitude` | `decimalLatitude`, `decimalLongitude`, `coordinateUncertaintyInMeters` | `latitude`, `longitude`, `coordinateUncertainty` |
+| Location: height above ground | `height_above_ground`, `ground_height` | — | — | `minimumDistanceAboveSurfaceInMeters` | `cameraHeight` |
+| Site | site | Site | `Site` ("Research Site") | `locationID`, `locality` | `locationID`, `locationName` |
+| Deployment | deployment | Station | `Deployment` | parent event (`parentEventID`) | deployment (`deploymentID`, `deploymentStart`, `deploymentEnd`) |
+| Session | night | Session | `Event` | event (`eventID`, `eventDate`) | — |
+| Capture Window | session (firmware settings) | — | — | child event (`parentEventID`) | `captureMethod` (`timeLapse`) |
+| Device: `deviceID` | device name (e.g. SnappySloth) | — | — | — | `cameraID` |
+| Device: `deviceType` | Mothbox Pro, Mothbox DIY | Device type | `Device` ("Device Configuration") | — | `cameraModel` |
+| Target | sheet, target | — | — | — | — |
+| Attractor | lights, UV | — | — | — | `baitUse` |
+| Protocol | — | — | fixed text in the draft export | `samplingProtocol`, `samplingEffort` | — |
+| Project (not defined yet) | dataset, package | Project | `Project` | `datasetID`, `datasetName` | package |

@@ -6,7 +6,7 @@ Add new entries at the top of the log, with a date. When a decision changes, add
 
 ## Requests for the Antenna / AMI team
 
-A living list. Status moves from “To ask” to “Asked” to the answer.
+A living list. Status moves from “To ask” to “Asked” to the answer. The agenda for the 2026-11-19 meeting, with the current Antenna behaviour for each item, is in [meetings/2026-11-19-antenna.md](meetings/2026-11-19-antenna.md).
 
 | Topic | What we are asking | Status |
 |---|---|---|
@@ -16,6 +16,10 @@ A living list. Status moves from “To ask” to “Asked” to the answer.
 | Catalogue of Life keys | Store `col_taxon_key` beside `gbif_taxon_key`. Newer GBIF species list downloads use Catalogue of Life keys, so taxa matched only by backbone key will stop lining up. | To ask |
 | Rotated boxes | Accept an optional rotated box on detections, so oriented boxes from Mothbox detectors are not lost. | Not decided yet; ask once decided |
 | Field-name style | Agree on one style for field names: camelCase (`deviceID`, `siteName`, like Darwin Core) or snake_case (`gbif_taxon_key`, like Antenna's code). | To raise at the next Antenna meeting |
+| Where identifications attach | Allow a human identification on a single detection as well as on an occurrence. Antenna attaches human identifications only to occurrences; Mothbot Classify attaches them to detections. | To ask (meeting 2026-11-19) |
+| Taxa list source | Record a taxa list's source and DOI, so a machine identification can cite the exact list it was limited to. Antenna's `TaxaList` has only a name, description and taxa. | To ask (meeting 2026-11-19) |
+| Session gap for Mothbox nights | Antenna splits sessions on a gap over 2 hours by default; the default Mothbox schedule has a 121-minute break, so one night becomes two sessions. Raise the gap for Mothbox projects, or mark nights explicitly on import. | To ask (meeting 2026-11-19) |
+| Non-target labels | Agree on a shared way to mark detections that are not creatures of interest (blur, frass, debris, plant material, error). | To ask (meeting 2026-11-19) |
 
 ## Open questions
 
@@ -72,6 +76,19 @@ To do once the terms are settled; the Mothbox tools will be conformed to the ont
 - Mothbot Process: write `direction` in X-AnyLabeling's convention (radians) on both detection paths, or derive it from the corners, so hand labels and detector output agree.
 
 ## Log
+
+### 2026-11-19: Preparing for the Antenna meeting
+
+- Checked the Nov 2 comparison against Antenna's current `main` (2026-11-13). Its names have not changed: Station for Deployment, Session for Event, Capture for SourceImage, Device type for Device, and separate `Classification` / `Identification` models.
+- New findings:
+    - Antenna's human identifications attach only to occurrences.
+    - Its taxa lists have no source or DOI.
+    - Its taxa store `bold_taxon_bin` and `inat_taxon_id` but no Catalogue of Life key.
+    - Its 2-hour session gap splits a default Mothbox night in two.
+    - Its draft Darwin Core export writes `samplingProtocol` as fixed text.
+- Both publishing standards use one word for human and machine answers, with a field for which made it: Darwin Core says identification (`identifiedBy`), Camtrap DP says classification (`classificationMethod`: `human` / `machine`). This supports one shared term; the open choice is which word.
+- Added a [crosswalk](README.md#crosswalk) to the README, mapping each term onto the Mothbox tools, Antenna (screen and code), Darwin Core and Camtrap DP.
+- Wrote the meeting agenda: [meetings/2026-11-19-antenna.md](meetings/2026-11-19-antenna.md). No terms were decided today.
 
 ### 2026-11-03: More definitions
 
