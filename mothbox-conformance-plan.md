@@ -2,7 +2,7 @@
 
 A plan for changing Mothbot Process, Mothbot Classify and the Mothbox firmware to match the terms decided in the [README](README.md), mostly at the [2026-11-19 Antenna meeting](meetings/2026-11-19-antenna.md).
 
-**Status:** first draft, 2026-11-22; decisions D1–D6 all made the same day. Nothing has been changed in the tools yet. The rule from 2026-11-03 still holds: settle the terms first, then change the tools.
+**Status:** decisions D1–D6 made 2026-11-22. Phases 1–3 committed in Classify on 2026-11-23 (`0dda3ef`). Phases 4–7 built the same day and merged into `main` of Classify, Process and the firmware as uncommitted changes, for testing. See the status note under each phase.
 
 File references are to the repos as of 2026-11-22: Classify `main` at `7ad9eb1`, Process at `0ce9611`.
 
@@ -40,6 +40,23 @@ The words on screen ([section 8](#8-words-on-screen)) change along with the phas
 
 ## 1. Identifications, determination and history
 
+**Status (2026-11-23): done in Classify, except the camelCase switch and the scale check.**
+- **Append-only saving** (`persist/persist-human-classifications.ts`). A row is added only when a detection's claim changed, and a reset adds a `withdrawn` row. Re-saving the same state adds nothing.
+- **Determination algorithm `mothbox-default/1`** (`resolve-classifications.ts`, `resolver-spec.md`). Each determination records the algorithm and the identification it came from.
+- **Agree** records `agreed_with`.
+- **History panel** in the detection details (double-click a patch). "Use this" on any other identification records the current person agreeing with it.
+- **New fields on each row:** `identification_id`, `occurrence_id`, `identifier_name` (the name as typed: full name or initials), `agreed_with`, `withdraws`. The existing `classifier_type` (`bot` / `human`) stands for `identifierType` until phase 7.
+- **Process:** `identify.py` now also keeps the previous machine ID in `bot_id_history` when a re-run reaches a different answer, not only when the model or species list changed.
+
+**Different from the plan:**
+- **New fields are snake_case** (`identification_id`, …), matching the rows they sit in. The camelCase switch for package files (D3) is left for one migration in phase 7. A Classify build from before that migration would drop camelCase rows when saving, so it is safer done once, together with a package version check.
+- **Process re-ID history isn't visible in Classify yet.** Classify doesn't read `bot_id_history`, and re-running identification on nights already in a package isn't picked up (only new nights and new detection runs are).
+
+**Still to do:**
+- Measure load and save time on the largest nights in Chrome (`scripts/chrome-harness`).
+- Add a package version check, so older Classify builds refuse packages they can't handle.
+
+
 **Ontology:** [Identification](README.md#identification), [Determination](README.md#determination), [Determination Algorithm](README.md#determination-algorithm), [Agree](README.md#agree).
 
 **Today (Classify):**
@@ -60,6 +77,17 @@ The words on screen ([section 8](#8-words-on-screen)) change along with the phas
 **Watch out:** append-only rows grow with every edit. Measure package load time on the largest nights.
 
 ## 2. Non-Target
+
+**Status (2026-11-23): done in Classify.**
+- **Labels** are paths (`NON_TARGET`, `NON_TARGET/Error/Blur`), with Error and Abiotic built in (`src/models/non-target.ts`). Older labels are read as the table below says, and written in the new form from then on.
+- **Picking a category:** the Identify dialog offers Non-Target, its categories, and "Add Non-Target category" (type e.g. "non-target plantae", "error glare" or "nt Plantae > Leaf").
+- **Storage:** categories people add are appended to `02_records/non-target-categories.ndjson`, with camelCase fields as decided for new files. Categories already used in labels are always offered.
+- **On screen,** "Error" became "Non-Target" in the selection bar (E key), the left panel, grid headers and the visualization options.
+
+**Different from the plan:**
+- **Old custom error reasons** in the browser are offered as Non-Target categories, but are only written into the dataset when someone adds a category, not on first open.
+- **The Darwin Core `name` column** for Non-Target now holds the new label (e.g. `NON_TARGET/Frass` instead of `ERROR_Frass`). Whether exports should leave Non-Target detections out is still undecided (step 5).
+
 
 **Ontology:** [Non-Target](README.md#non-target).
 
@@ -82,6 +110,13 @@ The words on screen ([section 8](#8-words-on-screen)) change along with the phas
 
 ## 3. Occurrences
 
+**Status (2026-11-23): steps 1 and 2 done in Classify; step 3 (tracking) not started.**
+- **New packages** write `occurrence_id` on every patch record (one per detection). Older packages default to the patch id.
+- **Identification rows** carry `occurrence_id`. The determination is worked out per occurrence and given to every detection of it.
+- **The Darwin Core export** writes `occurrenceID` from the occurrence. The values are unchanged for now, since each occurrence holds one detection.
+- **Process: no change yet.** Classify sometimes renames patch ids to keep them unique across nights, so occurrence ids written by Process wouldn't reliably match. Tracking in Process will need ids scoped to a deployment that the adapter can map.
+
+
 **Ontology:** [Occurrence](README.md#occurrence), [Detection](README.md#detection).
 
 **Today:** there is no occurrence record. The Classify export writes `occurrenceID` from the patch ID (`4.export/darwin-csv.ts`). Process's old exporter uses the patch filename (`pipeline/export_csv.py`).
@@ -93,6 +128,13 @@ The words on screen ([section 8](#8-words-on-screen)) change along with the phas
 
 ## 4. Taxon keys and taxa lists
 
+**Status (2026-11-23): done.**
+- **Key style names:** Classify and Process use the ontology's names (`gbif`, `col`, `bold`, `inat`, `fieldguide`) and still read the older `gbif-backbone`.
+- **Several keys per taxon:** a taxon can carry several keys (`taxonKeys`). Catalogue of Life lists give a species its BOLD BIN from the BIN rows that name it, and Antenna-style key columns (`bold_taxon_bin`, `inat_taxon_id`, …) are read too.
+- **Key style on identifications:** Process records each list's key style (`key_style`) and writes it on every machine identification (`species_list_key_style`).
+- **On screen,** "species list" became "taxa list".
+
+
 **Ontology:** [Taxon Keys](README.md#taxon-keys), [Taxa List](README.md#taxa-list).
 
 **Today (Classify):** `TaxonRecord.taxonID` plus `taxonIDSource`, which is `'gbif-backbone' | 'col'` (`models/taxonomy/species-list-source.ts`). That is already the "key plus key style" the meeting agreed on. Taxa lists record their DOI (`speciesListDOI`).
@@ -103,6 +145,28 @@ The words on screen ([section 8](#8-words-on-screen)) change along with the phas
 3. Every taxa list records its source (DOI or URL) and key style. Process does the same for the lists in `specieslists/`.
 
 ## 5. Deployments, devices and events
+
+**Status (2026-11-23): mostly done.**
+
+Done:
+- **Device-type list:** copied into Process (`assets/device-types.json`) and Classify (`src/config/device-types.json`). Classify resolves customized types through `derivedFrom`.
+- **Process field sheet:** reads `device_type`, `facing_direction`, `site_description`, `land_use_type`, target size and distance, and sensor type and resolution. It turns `attractor1…5` with `_location`, `_power` and `_settings` into an attractor list. It writes all of these in the ontology's camelCase names, with photo EXIF filling the device name, type and firmware when the sheet leaves them out.
+- **Process sessions:** detection writes `_processed/<deployment>/sessions.json` (noon-to-noon nights, with capture windows found from gaps in capture times). It never changes existing sessions.
+- **Classify adapter:**
+    - Copies the sessions into `02_records/sessions.ndjson`. Without a file, it makes default nightly sessions.
+    - Gives each patch a `session_id` and `capture_window_id`.
+    - Records device, site and location details on each deployment.
+    - New nights and merged folders only add sessions.
+- **Firmware (Unified 6.x):**
+    - The settings file and settings editor say "capture window" for each scheduled stretch; the `runtime` key is unchanged.
+    - Photos' EXIF now include `deviceTypeID`.
+    - The firmware's internal `session` (one period the box stays awake, which can span several capture windows) and the e-paper's "SESSION ENDS" were left as they are.
+
+Not done yet:
+- A Classify screen to edit sessions (merge or split nights).
+- A screen to add or customize device types.
+- Sessions for AMI data, which comes with Antenna's own sessions.
+
 
 **Ontology:** [Deployment](README.md#deployment), [Session](README.md#session), [Capture Window](README.md#capture-window), [Capture](README.md#capture), [Site](README.md#site), [Location](README.md#location), [Device](README.md#device), [Device Type](README.md#device-type), [Attractor](README.md#attractor), [Sensor](README.md#sensor), and the tree in [How the pieces fit together](README.md#how-the-pieces-fit-together).
 
@@ -152,6 +216,14 @@ The words on screen ([section 8](#8-words-on-screen)) change along with the phas
 
 ## 6. Boxes
 
+**Status (2026-11-23): done.**
+- **Process:** both detection paths write `direction` in X-AnyLabeling's convention (radians, the angle of the first edge) and a labelled `box` with four relative corners (`core/boxes.py`).
+- **Classify:**
+    - The adapter stores `crop_box` on every patch source: Process's box, or one worked out from the pixel corners and the image size. AMI crops get `xyxy-px`.
+    - The overlay can draw from a labelled box when there are no pixel corners.
+    - Conversions for every format label are in `src/models/box-formats.ts`. For `xyxyr`, Antenna's units aren't fixed yet, so radians turning clockwise on screen are assumed.
+
+
 **Ontology:** [Box Formats](README.md#box-formats). Background: [Ways to write a box](NOTES.md#ways-to-write-a-box).
 
 **Today (Process, `pipeline/detect.py`):**
@@ -179,6 +251,19 @@ Antenna's "x1, y1, x2, y2 + rotation" is a form of B: two opposite corners of an
 4. **Classify** reads both labelled and unlabelled boxes.
 
 ## 7. Export field names
+
+**Status (2026-11-23): done.**
+- **Classify's Darwin Core CSV:**
+    - All columns renamed as in the table below.
+    - New columns: `identifierType`, `determinationAlgorithm`, per-style taxon keys (`gbifTaxonKey`, `colTaxonKey`, `boldBIN`, `inatTaxonID`, `fieldguideID`), `nonTarget`, `nonTargetCategory`, `deviceType`, `sessionID`, `sessionStart`, `sessionEnd`, `captureWindowID`.
+    - `parentEventID` is now the capture window (or the session), and `taxonIDSource` holds a key style such as `col`.
+- **Process's `export_csv.py`** (used only by the older FiftyOne step) uses the same names.
+- **Package files:**
+    - Format 4 means camelCase, since existing packages are already format 3.
+    - Classify reads either style, refuses anything newer than format 4, and writes each package in its own style. New packages are format 4.
+    - **Automatic conversion (decided 2026-11-23):** an older package is converted when it is opened. Classify backs up every record and identification file, checks the backup, converts the files (dataset.json last), and re-reads and compares every row. The backup is deleted only if everything matches; otherwise the originals go back and the backup stays.
+    - Tested on copies of all 20 real packages in `MB Projects` (up to 181k patches): every one converted and loaded exactly as before.
+
 
 **Ontology:** [Field Names](README.md#field-names).
 
@@ -218,5 +303,33 @@ Changed along with the phase that touches each one:
 | Error | Non-Target | 2 |
 | species list | taxa list (keep "species list" only for GBIF species-list downloads) | 4 |
 | confidence | score (detection score, identification score) | 7 |
-| night | stays "night" as the name of the default session type | 5 |
-| dataset | project (in Classify's screens; the `dataset.json` file name can stay until the next package format version) | 7 |
+| night | session (done 2026-11-23, in Classify's screens; night folders on disk keep the name) | 5 |
+| All unapproved | All unreviewed (done 2026-11-23) | 1 |
+| dataset | project (in Classify's screens; the `dataset.json` file name can stay) | 7 |
+
+## Future features
+
+Ideas from Andrew (2026-11-23), not planned in detail yet.
+
+### Device setup screen
+
+A screen to pick and customize [device types](README.md#device-type), the way 3D-printer slicers work: start from a built-in device (Standard Mothbox Pro, Standard Mothbox DIY, AMI Device), or define your own.
+
+- **Data:** the built-in list is [device-types/device-types.json](device-types/device-types.json). A custom type is saved with `derivedFrom`, and its own fields replace its parent's. Classify already resolves these (`src/models/device-types.ts`).
+- **Where:** useful in the firmware settings editor (`mothbox_settings_editor.html`), in Process (field-sheet step), and in Classify (deployment details).
+
+### Export sessions or a project for a collaborator
+
+Export a compressed (zipped) copy of the processed side of the data for a set of sessions or a whole project.
+
+- **Contents:** detection files, patches, `sessions.json`, and the package records and identifications.
+- **Leave out:** full-size photos, unless asked.
+- **Format:** the zip should open as a package in Classify, and ideally import into Antenna.
+
+### Schedules as metadata
+
+Treat the capture schedule like a device type: named standard schedules to pick from or customize, recorded with each deployment.
+
+- **Example:** "5 × 59 min from 19:00", "dusk only", "all night".
+- **Use:** sort or filter data by schedule during analysis.
+- **Fits with:** the ontology's [Protocol](README.md#protocol) and capture windows. A named schedule could become part of the protocol.
