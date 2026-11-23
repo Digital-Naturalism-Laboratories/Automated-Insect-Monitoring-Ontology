@@ -10,22 +10,20 @@ A living list. Status moves from “To ask” to “Asked” to the answer. The 
 
 | Topic | What we are asking | Status |
 |---|---|---|
-| Identification vs classification | Use one word, “identification”, for both machine and human answers, and tell them apart with `identifierType` (`machine` / `human`) and `identifierName`. Antenna currently stores machine answers as `Classification` (“Machine prediction” on screen) and human answers as `Identification`. | To ask |
-| Site and station | Adopt “site”, used interchangeably with “station” on screen if they prefer, and keep coordinates in a separate “location” instead of bundling them with the station. | To ask |
-| Device type and device ID | Keep “Device type” for the hardware kind (`deviceType`), and consider recording individual devices (`deviceID`, e.g. `SnappySloth`). Antenna currently has no record of an individual device. | To ask |
-| Catalogue of Life keys | Store `col_taxon_key` beside `gbif_taxon_key`. Newer GBIF species list downloads use Catalogue of Life keys, so taxa matched only by backbone key will stop lining up. | To ask |
-| Rotated boxes | Accept an optional rotated box on detections, so oriented boxes from Mothbox detectors are not lost. | Not decided yet; ask once decided |
-| Field-name style | Agree on one style for field names: camelCase (`deviceID`, `siteName`, like Darwin Core) or snake_case (`gbif_taxon_key`, like Antenna's code). | To raise at the next Antenna meeting |
-| Where identifications attach | Allow a human identification on a single detection as well as on an occurrence. Antenna attaches human identifications only to occurrences; Mothbot Classify attaches them to detections. | To ask (meeting 2026-11-19) |
-| Taxa list source | Record a taxa list's source and DOI, so a machine identification can cite the exact list it was limited to. Antenna's `TaxaList` has only a name, description and taxa. | To ask (meeting 2026-11-19) |
-| Session gap for Mothbox nights | Antenna splits sessions on a gap over 2 hours by default; the default Mothbox schedule has a 121-minute break, so one night becomes two sessions. Raise the gap for Mothbox projects, or mark nights explicitly on import. | To ask (meeting 2026-11-19) |
-| Non-target labels | Agree on a shared way to mark detections that are not creatures of interest (blur, frass, debris, plant material, error). | To ask (meeting 2026-11-19) |
+| Identification vs classification | One word for both machine and human answers, told apart with `identifierType` and `identifierName`. | Decided 2026-11-19: the main term is **determination**, picked from identifications by a determination algorithm. Each claim is an identification; Antenna's machine `Classification` counts as a machine identification. To confirm: whether Antenna renames anything on screen. |
+| Site and station | Adopt “site”, used interchangeably with “station” on screen if they prefer, and keep coordinates in a separate “location”. | Decided 2026-11-22: Antenna may keep “Station” on screen, but its data will follow the agreed site, location and deployment structure. |
+| Device type and device ID | Record individual devices (`deviceID`) as well as device types. | Decided 2026-11-19: every device has its own ID; device types are user-definable, with three defaults (Standard Mothbox Pro, Standard Mothbox DIY, AMI Device). |
+| Catalogue of Life keys | Store `col_taxon_key` beside `gbif_taxon_key`. | Decided 2026-11-19: both tools will support several key styles (GBIF, COL, BOLD, iNaturalist, Fieldguide), and each taxa list records its source (e.g. DOI) and key style. |
+| Rotated boxes | Accept an optional rotated box on detections. | Decided 2026-11-19: Antenna will add oriented boxes ([issue #1421](https://github.com/RolnickLab/antenna/issues/1421)); every box carries a format label; new boxes are relative. The Mothbox format (decided 2026-11-22) is four relative corner points (`obb-corners-rel`). Antenna's “x1, y1, x2, y2 + rotation” means two corners of an upright rectangle, rotated around its centre (`xyxyr`); the tools convert between the two. |
+| Field-name style | camelCase or snake_case. | Decided 2026-11-19: each language's own style in code (snake_case in Python); camelCase in exported files, following Darwin Core. |
+| Where identifications attach | Allow a human identification on a single detection as well as on an occurrence. | Decided 2026-11-19: every detection belongs to an occurrence, and identifications and determinations attach to the occurrence. Mothbox occurrences usually hold one detection. |
+| Taxa list source | Record a taxa list's source and DOI. | Decided 2026-11-19 (with the taxon keys decision). |
+| Session gap for Mothbox nights | Antenna's 2-hour default gap splits a default Mothbox night in two. | Decided 2026-11-22: the 2-hour gap is only Antenna's default. Both tools will let people define and edit sessions, and keep sessions already defined in data they import. Mothbox data with default nightly sessions (noon to 11:59 the next morning) keeps them in Antenna. To ask: Antenna support for importing session definitions. |
+| Non-target labels | A shared way to mark detections that are not creatures of interest. | Decided 2026-11-19: top-level **Non-Target** with a user-defined hierarchy below it, starting with Error and Abiotic. |
 
 ## Open questions
 
-- **How a rotated box is written.** An upright box can be written several ways, and a rotated one has even more. See [Ways to write a box](#ways-to-write-a-box) below. Proposal: always give an upright box that every tool can read, and add the rotated box as four corner points when there is one; treat any angle as a convenience copy, not the record. Not decided yet.
-- **Target or stage.** “Target” (the sheet, tube or flower creatures land on) is still a draft name; “stage” is one alternative.
-- **Project vs dataset.** Andrew is still thinking about whether these are two terms (the body of work and its people, and a portable package of its files) or one.
+None at the moment.
 
 ## Background
 
@@ -64,18 +62,39 @@ An angle brings its own questions: degrees or radians, which way is positive, an
 
 ## Changes needed in the Mothbox tools
 
-To do once the terms are settled; the Mothbox tools will be conformed to the ontology then, not before. None of these are done.
-
-- Mothbot Classify: rename the “Accept” action to “Agree” (the A shortcut can stay).
-- Mothbot Classify and Process: use “taxa list” in the interface, keeping “species list” only for GBIF species list downloads.
-- Record `identifierType` and `identifierName` on every identification, with the taxa list DOI for machine identifications. Classify currently records people by initials only, so a full name or stable account would be needed.
-- Rename `confidence_detection` and `confidence_ID` to detection score and identification score in new exports, and keep reading the old names.
-- Write `deviceID`, `deviceType`, `sensorType`, `siteName`, `siteDescription` and the location coordinates as separate fields in exports.
-- Store `col_taxon_key` (the current `taxonID` values) and, where it can be looked up, `gbif_taxon_key`.
-- Mothbox firmware: say “capture window” instead of “session” for each scheduled stretch of photo-taking (settings file text and logs).
-- Mothbot Process: write `direction` in X-AnyLabeling's convention (radians) on both detection paths, or derive it from the corners, so hand labels and detector output agree.
+Moved to [mothbox-conformance-plan.md](mothbox-conformance-plan.md), which covers every decided term. The tools are still not to be changed until that plan is agreed.
 
 ## Log
+
+### 2026-11-22: Follow-up decisions
+
+Made by Andrew after the Antenna meeting.
+
+- **Target and stage** can be used interchangeably for now.
+- **Project, not dataset.** A project is a collection of data that someone wants to process. “Dataset” is no longer a separate term; Mothbot Classify's “dataset” becomes “project”.
+- **Field names in files.** Anything written to a file is camelCase: CSV, JSON and NDJSON, including the Mothbox tools' own dataset files. snake_case stays only inside Python code. camelCase is the most common style for JSON and matches Darwin Core and Camtrap DP.
+- **Session files.** Sessions are written down explicitly, in one file per deployment next to the processed data. Mothbot Process creates it automatically with the default nightly sessions (noon to 11:59 the next morning), in `_processed/<deployment>/sessions.json`. This is what lets Antenna keep Mothbox sessions on import instead of regrouping them.
+- **Box format.** Mothbox oriented boxes are four relative corner points (`obb-corners-rel`). X-AnyLabeling files stay as they are; their format gets its own label (`xanylabeling-rotation-px`), so it can be converted when needed.
+- **Antenna's oriented box.** “x1, y1, x2, y2 + rotation” means two opposite corners of an upright rectangle, rotated around its centre. It gets the format label `xyxyr` and converts to and from four corners.
+- **Names of people.** An identification can record a person by full name or by initials.
+- **Frass** is plain Non-Target, or the user's own Non-Target › Frass subcategory. It is not built in.
+- **Device types.** A device-type list (skeleton) is now in [device-types/](device-types/), with the three built-in types.
+- **Station.** Antenna may keep “Station” on its screens; its data will follow the agreed site, location and deployment structure.
+- **Sessions.** Antenna's 2-hour gap is only its default. Both tools will let people define and edit sessions, and keep sessions already defined in data they import. Mothbox's default nightly session runs from noon to 11:59 the next morning, and a Mothbox night imported into Antenna keeps that session, unless someone regroups it by hand.
+
+### 2026-11-19: Decisions at the Antenna meeting
+
+Made jointly with the Antenna / AMI team. Full notes per agenda item are in [meetings/2026-11-19-antenna.md](meetings/2026-11-19-antenna.md).
+
+- **Determination is the main term.** The determination (det) is the flagged best guess of what an occurrence is, chosen from its identifications by a determination algorithm. The algorithm can be simple (latest identification wins) or complex (weighing scores). The Mothbox default: if there are human identifications, use the latest one; otherwise use the latest machine identification. Classify shows the determination and, in a detection's details, its history of identifications, from which a person can choose a different one.
+- **Detection and occurrence.** A detection is the evidence of a creature in the sensor data at one moment. An occurrence is one individual creature. Every detection belongs to an occurrence, and identifications and determinations attach to the occurrence. Antenna leaves out small insects and tracks larger ones across captures, so its occurrences can hold many detections. Mothbox keeps even tiny creatures, where tracking is often impossible, so most Mothbox occurrences hold one detection; tracking can merge them later. Clusters stay separate: they group detections that look alike, which can be evidence toward a shared occurrence.
+- **Events.** Deployment (user-definable; default: a device left at a site until a person retrieves it) › session (user-defined period of interest; Mothbox default one night, AMI has its own defaults) › capture window (continuous captures at a regular interval, usually with the attractor on) › capture (one instant of sensor data). Capture is new.
+- **Devices.** Each device has its own ID (e.g. SnappySloth). Device types are user-definable and customizable, with three defaults: Standard Mothbox Pro, Standard Mothbox DIY and AMI Device (e.g. a Mothbox Pro with an external instead of an internal attractor). A deployment records the site (with metadata such as land-use type), the location (GPS, height above ground, facing direction) and the device (type, firmware version, one or more attractors with type, location and power level, target size and distance, sensor type and attributes, and user-defined fields).
+- **Taxon keys.** Both tools will support several key styles (BOLD, iNaturalist, Fieldguide UUID, Catalogue of Life, GBIF). Each taxa list records its source (e.g. a DOI) and the style of its keys.
+- **Field names.** Each language's own style in code (snake_case in Python); camelCase in exported CSVs and similar, following Darwin Core.
+- **Boxes.** Antenna will add oriented bounding boxes ([issue #1421](https://github.com/RolnickLab/antenna/issues/1421); Antenna suggested x1, y1, x2, y2 plus a rotation, all floats). Every box carries a label naming its format. New boxes are relative to the image size, and Mothbox data already processed with pixel boxes stays readable. The Mothbox tools still need to choose one rotated format; today they mix X-AnyLabeling's and YOLO OBB's.
+- **Non-Target.** Mothbot's catch-all “error” category becomes **Non-Target**: things we aren't interested in, too distorted to use, or produced by a detection error. Users can build their own hierarchy below it, with two built-in subcategories, Error (e.g. blur) and Abiotic (e.g. camera glare). They can go as specific as they want (e.g. Non-Target › Plantae) or stop at Non-Target.
+- **Not discussed:** the word “Station” on Antenna's screens; Antenna's 2-hour default session gap.
 
 ### 2026-11-19: Preparing for the Antenna meeting
 
