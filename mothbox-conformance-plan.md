@@ -313,12 +313,44 @@ Ideas from Andrew (2026-11-23), not planned in detail yet.
 
 ### Device setup screen
 
+**Status (2026-11-23): first version in Classify (uncommitted).** "Devices…" in the dataset's "…" menu.
+- **Device types tab:** pick a built-in type, "Customize" it into your own, or start a new one.
+    - **Each type has:** name, maker, computer, hardware version, firmware version, 0+ attractors (type, location, power), 0+ targets (type, material, width, height, distance) and 1+ sensors (type, model, resolution, notes).
+    - **Saved in:** `02_records/device-types.ndjson`.
+- **Deployments tab:** choose each deployment's device type.
+- **Shared list:** `device-types.json` moved to format 2 (`targets` list, `hardwareVersion`, `firmware.version`, sensor `resolution` and `notes`).
+- **Firmware settings editor (uncommitted):** a Device section. Choose a built-in type or "Customize" it; the choice is saved as JSON in the settings file's `device_type` row. `TakePhoto.py` writes it into every photo's EXIF (`UserComment` → `device`, plus `deviceTypeID`).
+- **Process, Setup and Insert Metadata tabs (uncommitted):** the same optional Device section on both tabs, showing one shared choice.
+    - **Reading the photos:** it reads the photos' EXIF (up to 25 photos) when folders are chosen.
+    - **Choosing:** keep what the photos say (the default; photos that say nothing get no device type), choose a standard type or one found in the photos, or "Customize…" one. The editor has the same fields as Classify's, and custom devices are remembered in `~/.mothbot/device-types.ndjson`. The choice wins over the field sheet's `device_type`, which wins over the EXIF. Detection files get `deviceTypeID`, `deviceType` and the full `deviceTypeDefinition`.
+- **Classify, reading Process's files (uncommitted):** a detection file's `deviceTypeDefinition` sets the deployment's device type. Custom types are added to `02_records/device-types.ndjson` when a project is made, sessions are added, or a folder is merged; types already in the project are kept as edited.
+- **Classify, viewing by device (uncommitted):** a "Devices" menu on the project page filters deployments, and their sessions, by device type or by attractor, target or sensor type (e.g. only UV). It can also group deployments by device type; each deployment row shows its type.
+- **Format 3 (2026-11-23):**
+    - **New choices:** Mothbeam (Visible) and Mothbeam (UV) attractors with their light configurations and power; "in target" as an attractor location; target materials and colors.
+    - **New fields:** attractor `hardwareVersion`; target `color`; device `powerSources` (battery, grid, solar; the TalentCell PB120B1 is 142 Wh) and `description`.
+    - **Where it works:** the Classify and firmware editors, and the Classify Devices filter (power source).
+- **Power sources and the firmware's battery settings (2026-11-24):**
+    - **Battery fields:** batteries have `capacityWh`, `nominalVoltageV`, `voltageAt80PercentV` and `voltageAt20PercentV`. The TalentCell PB120B1 entry holds the firmware's defaults (142 Wh, 11.1 V, 12.0 V, 10.5 V).
+    - **Settings editor:** the Battery section moved into the Device section as "Power source", with battery, grid and solar checkboxes and a battery model. The four battery numbers are still the `bat_*` rows, and the gauge uses them whether or not a power source is chosen.
+    - **Photos:** EXIF now carries `powerSources` and `description`.
+    - **Mothbox display:** when the chosen power sources leave out a battery, the display shows the raw input voltage instead of the battery gauge.
+    - **Classify:** keeps a box's own power sources on its deployment, even for a standard type, and filters by them.
+- **Keeping copies in step:** [device-types/sync-copies.py](device-types/sync-copies.py) copies `device-types.json` into Classify, Process and the firmware editor (`--check` only reports).
+- **Not yet:** the visualizer has no device filter; the field sheet can't name a custom type's full description (only a type name or id).
+
 A screen to pick and customize [device types](README.md#device-type), the way 3D-printer slicers work: start from a built-in device (Standard Mothbox Pro, Standard Mothbox DIY, AMI Device), or define your own.
 
 - **Data:** the built-in list is [device-types/device-types.json](device-types/device-types.json). A custom type is saved with `derivedFrom`, and its own fields replace its parent's. Classify already resolves these (`src/models/device-types.ts`).
 - **Where:** useful in the firmware settings editor (`mothbox_settings_editor.html`), in Process (field-sheet step), and in Classify (deployment details).
 
 ### Export sessions or a project for a collaborator
+
+**Status (2026-11-23): first version in Classify (uncommitted).**
+- **Where:** "Export zip for a collaborator…" in the home screen's right-click menu and the dataset's "…" menu.
+- **Contents:** pick sessions, optionally include full-size photos. The zip holds `dataset.json`, the records and every identification file filtered to those sessions (history kept), the patch images and detection JSONs, and an `export-report.json`.
+- **How it's written:** streamed, using zip64 (`client-zip`), so size doesn't matter. It goes to a file you choose, or to the package's `04_exports/`.
+- **Tested:** an export of BikeBlitz night3 opens as a package with the same patches and determinations.
+- **Not yet:** background-removed `_nobg.png` patches; full-size photos that sit outside the package folder; importing into Antenna.
 
 Export a compressed (zipped) copy of the processed side of the data for a set of sessions or a whole project.
 
