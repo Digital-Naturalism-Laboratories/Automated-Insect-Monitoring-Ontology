@@ -329,12 +329,18 @@ Ideas from Andrew (2026-11-23), not planned in detail yet.
     - **New choices:** Mothbeam (Visible) and Mothbeam (UV) attractors with their light configurations and power; "in target" as an attractor location; target materials and colors.
     - **New fields:** attractor `hardwareVersion`; target `color`; device `powerSources` (battery, grid, solar; the TalentCell PB120B1 is 142 Wh) and `description`.
     - **Where it works:** the Classify and firmware editors, and the Classify Devices filter (power source).
-- **Power sources and the firmware's battery settings (2026-11-24):**
-    - **Battery fields:** batteries have `capacityWh`, `nominalVoltageV`, `voltageAt80PercentV` and `voltageAt20PercentV`. The TalentCell PB120B1 entry holds the firmware's defaults (142 Wh, 11.1 V, 12.0 V, 10.5 V).
-    - **Settings editor:** the Battery section moved into the Device section as "Power source", with battery, grid and solar checkboxes and a battery model. The four battery numbers are still the `bat_*` rows, and the gauge uses them whether or not a power source is chosen.
-    - **Photos:** EXIF now carries `powerSources` and `description`.
-    - **Mothbox display:** when the chosen power sources leave out a battery, the display shows the raw input voltage instead of the battery gauge.
-    - **Classify:** keeps a box's own power sources on its deployment, even for a standard type, and filters by them.
+- **Power source (2026-11-24, format 4):**
+    - **One per device:** a device has one `powerSource` (battery, grid or solar), or none. Each kind has its own details: battery capacity and voltages, grid supply voltage, solar panel watts, plus model and notes. More can be added per kind later.
+    - **Standard setups:** `choices.powerSources` holds them; changing one's details makes a custom setup with `derivedFrom`. They are a TalentCell PB120B1, a 12 V mains adapter, and a solar panel. The last two are placeholders.
+    - **Settings editor:** the battery numbers are still the `bat_*` rows. They turn the measured voltage into the display's battery percentage, and nothing else uses them; there is no battery-based shutdown.
+    - **Mothbox display:** shows the raw input voltage when the power source is grid or solar.
+    - **Classify:** keeps a box's own power source on its deployment and filters by it.
+- **Custom power setups (2026-11-24):** named custom setups, saved and offered on their own.
+    - **Classify:** a Power setups tab in Devices…, saved in `02_records/power-sources.ndjson`. Also added from detection files when a project is made, sessions are added or a folder is merged, and included in zip exports (with the project's device types, which the export used to leave out).
+    - **Process:** saved in `~/.mothbot/power-sources.ndjson`.
+    - **Firmware editor:** a setup name.
+- **Cloud upload placeholders (settings editor):** `cloud_service`, `cloud_url`, `cloud_bucket`, `cloud_region`, `cloud_user`, `cloud_password`, `cloud_api_key`, `cloud_api_secret`, `cloud_token`. The firmware doesn't use them yet, and they're stored as plain text.
+- **Firmware 6.1.3:** version files bumped, and the standard Mothbox Pro's firmware version is now 6.1.3.
 - **Keeping copies in step:** [device-types/sync-copies.py](device-types/sync-copies.py) copies `device-types.json` into Classify, Process and the firmware editor (`--check` only reports).
 - **Not yet:** the visualizer has no device filter; the field sheet can't name a custom type's full description (only a type name or id).
 

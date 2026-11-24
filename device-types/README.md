@@ -6,7 +6,7 @@
 
 **Built-in types:**
 - **Standard Mothbox Pro:** Andrew's measured profile.
-    - **Hardware:** version 5.0.6, firmware 6.1.2.
+    - **Hardware:** version 5.0.6, firmware 6.1.3.
     - **Attractors:** a Mothbeam (UV) and a Mothbeam (Visible), both internal, at `1 switch` (2 W).
     - **Target:** a felt sheet, 28.9 × 20.5 cm, 24.5 cm from the camera.
     - **Camera:** OwlSight 64 MP on a Raspberry Pi 5.
@@ -17,6 +17,8 @@
     - **Corrections:** the AMI and LepiSense teams can correct their entries.
 
 ## Fields
+
+Format version 4 (2026-11-24): a device has one `powerSource` (an object, or `null`) instead of a `powerSources` list, and `choices.powerSources` holds standard power setups. A device type that can run on several kinds of power lists them in `customFields.powerOptions`.
 
 Format version 3 (2026-11-23):
 - **Attractors:** gained `hardwareVersion` and `configuration`.
@@ -45,17 +47,35 @@ Format version 2 (2026-11-23): `targets` became a list, sensors gained `resoluti
 | `attractors[].powerW` | Power in watts. |
 | `targets[]` | Zero or more [targets](../README.md#target): `targetType` (e.g. sheet, tube), `material` (e.g. felt, canvas, vinyl), optional `color` (e.g. white, yellow), `widthCm`, `heightCm`, and `distanceCm` from the sensor. |
 | `sensors[]` | One or more [sensors](../README.md#sensor): `sensorType` (`camera`, `infrared`, `lidar`, …), `model`, `lens`, `resolution` (e.g. `64 MP`), `effectiveResolutionPxPerMm`, `sensitivityRange`, `orientation`, `notes`. |
-| `powerSources[]` | Optional, one or more: `powerSourceType` (`battery`, `grid`, `solar`) and `model` (e.g. `Standard TalentCell PB120B1`). |
-| `powerSources[].capacityWh` | Batteries: energy capacity in watt hours. |
-| `powerSources[].nominalVoltageV` | Batteries: the voltage printed on the battery. |
-| `powerSources[].voltageAt80PercentV`, `voltageAt20PercentV` | Batteries: the voltage when about 80% and 20% full, which calibrates a battery gauge. |
+| `powerSource` | Optional: what powers the device, exactly one setup (or `null`, not specified). |
+| `powerSource.powerSourceType` | `battery`, `grid` or `solar`. |
+| `powerSource.powerSourceID`, `name`, `derivedFrom` | Which setup: a standard one from `choices.powerSources`, or a customized one with its own ID that names the standard it came from. |
+| `powerSource.model`, `notes` | Any type. |
+| `powerSource.capacityWh` | Battery: energy capacity in watt hours. |
+| `powerSource.nominalVoltageV` | Battery: the voltage printed on the battery. |
+| `powerSource.voltageAt80PercentV`, `voltageAt20PercentV` | Battery: the voltage when about 80% and 20% full, which calibrates a battery gauge. |
+| `powerSource.supplyVoltageV` | Grid: the supply's output voltage. |
+| `powerSource.panelPowerW` | Solar: the panel's rated power in watts. |
 | `computer` | The computer that runs it. |
 | `description` | Notes about the whole device. |
 | `customFields` | Anything else people want to record, as name–value pairs. |
 
 ## Choices
 
-`choices` lists suggested values that the editors offer: attractor types and locations, target types, materials and colors, sensor types, power source types, and known batteries with their capacity and voltages. The Standard TalentCell PB120B1 values (142 Wh, 11.1 V, 12.0 V at 80%, 10.5 V at 20%) are also the Mothbox firmware's battery defaults. Any other value is still allowed.
+`choices` lists suggested values that the editors offer: attractor types and locations, target types, materials and colors, sensor types, and power source types. Any other value is still allowed.
+
+`choices.powerSources` lists standard power setups, one or more per type. Pick one, or change its details or name to make a custom setup. Each type has its own fields, so more can be added per type later.
+
+Custom power setups are saved and offered on their own, next to the standard ones:
+- **Classify:** Devices… → Power setups, saved in the project's `02_records/power-sources.ndjson`. Setups found in Process's detection files are added there too.
+- **Process:** saved in `~/.mothbot/power-sources.ndjson` when a custom device using one is applied.
+- **Firmware settings editor:** named and kept with that box's device (in the `device_type` row).
+
+| Setup | Type | Details |
+|---|---|---|
+| Standard TalentCell PB120B1 | battery | 142 Wh, 11.1 V nominal, 12.0 V at 80%, 10.5 V at 20%. These are also the Mothbox firmware's battery defaults. |
+| Mains adapter, 12 V | grid | 12 V supply. A placeholder until there's a standard one. |
+| Solar panel | solar | Panel power not filled in. A placeholder until there's a standard one. |
 
 `choices.attractorPowerOptions` gives the power of each light configuration for attractors that have them. These are Mothbeam 5.0.3, measured at 12 V and rounded to the nearest half watt, except `0 switches`, which stays at 0.2 W. `measured` keeps the measured value.
 
