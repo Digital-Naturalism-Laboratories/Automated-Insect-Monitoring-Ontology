@@ -4,13 +4,10 @@
 
 **After editing it**, run `python3 device-types/sync-copies.py` to copy it into Classify (`src/config/device-types.json`), Process (`assets/device-types.json`) and the firmware settings editor (embedded in `mothbox_settings_editor.html`). `--check` only reports which copies differ.
 
-**Built-in types:**
-- **Standard Mothbox Pro:** Andrew's measured profile.
-    - **Hardware:** version 5.0.6, firmware 6.1.3.
-    - **Attractors:** a Mothbeam (UV) and a Mothbeam (Visible), both internal, at `1 switch` (2 W).
-    - **Target:** a felt sheet, 28.9 × 20.5 cm, 24.5 cm from the camera.
-    - **Camera:** OwlSight 64 MP on a Raspberry Pi 5.
-- **Standard Mothbox DIY:** still a skeleton. `null` means "not filled in yet", not "none".
+**Built-in types** (the Mothbox ones and LepiSense's attractor set by Andrew in Classify, 2026-11-25):
+- **Standard Mothbox Pro:** hardware 5.0.6, firmware 6.1.3. A Mothbeam (UV) and a Mothbeam (Visible), both internal at 1 switch (2 W). A white felt sheet, 28.9 × 20.5 cm, 24.5 cm from the camera. OwlSight 64 MP on a Raspberry Pi 5. Powered by the Standard TalentCell PB120B1.
+- **Standard Mothbox DIY:** the older setup. Hardware 4.16, firmware 6.1.3. A Mothbeam (Visible) and a Mothbeam (UV), both internal at 1 switch. A white felt sheet, 29 × 20.5 cm, 24 cm away. OwlSight 64 MP on a Raspberry Pi 5. Powered by the Standard TalentCell PB120B1.
+- **LepiSense:** one UV + white LED attractor in the target.
 - **AMI Device, DIOPSIS, Entocam, LepiSense:** filled in from the [InsectAI COST Action hardware database](https://insectai-cost-action.github.io/hardware-db/) (2026-11-23).
     - **Where the database's facts go:** what it states maps onto the usual fields. Its description goes in `description`. Size, weight, IP rating, temperatures, autonomy and links go in `customFields`, with `source`.
     - **Left as `null`:** anything the database doesn't state, such as the AMI's attractor and camera, and most target details.
@@ -73,7 +70,8 @@ Custom power setups are saved and offered on their own, next to the standard one
 
 | Setup | Type | Details |
 |---|---|---|
-| Standard TalentCell PB120B1 | battery | 142 Wh, 11.1 V nominal, 12.0 V at 80%, 10.5 V at 20%. These are also the Mothbox firmware's battery defaults. |
+| Standard TalentCell PB120B1 | battery | 142 Wh, 11.1 V nominal, 12.0 V at 80%, 10.5 V at 20%: the battery built into Mothboxes. These are also the firmware's battery defaults. |
+| TalentCell PB120B1 with Extra External Battery | battery | 260 Wh, same voltages: a second TalentCell on the charging port to last longer in a session. |
 | Mains adapter, 12 V | grid | 12 V supply. A placeholder until there's a standard one. |
 | Solar panel | solar | Panel power not filled in. A placeholder until there's a standard one. |
 
