@@ -341,6 +341,13 @@ Ideas from Andrew (2026-11-23), not planned in detail yet.
     - **Firmware editor:** a setup name.
 - **Cloud upload placeholders (settings editor):** `cloud_service`, `cloud_url`, `cloud_bucket`, `cloud_region`, `cloud_user`, `cloud_password`, `cloud_api_key`, `cloud_api_secret`, `cloud_token`. The firmware doesn't use them yet, and they're stored as plain text.
 - **Firmware 6.1.3:** version files bumped, and the standard Mothbox Pro's firmware version is now 6.1.3.
+- **Review, 2026-11-26** (a pass over the week's work in all repos):
+    - **Process sessions:** a night already covered by an existing session (renamed or edited) no longer gets a second, overlapping default session.
+    - **Antenna converter:**
+        - Unidentified `creature` detections are no longer exported as a taxon called "creature" (6,088 in DesertHouse).
+        - Boxes go to Antenna whole, even where they stick out past the photo (517 in DesertHouse), as in Process. Antenna stores them as sent, and only trims the crop image it cuts.
+        - Tested in a local Antenna, 2026-11-26: six DesertHouse photos, 125 detections. Every detection got an occurrence; unidentified ones have no determination. All 15 people's identifications arrived, including Non-Target.
+    - **Classify:** the Devices filter is no longer cleared on returning from a session. Wording leftovers ("Datasets folder", "Back to datasets", help text and examples) now say project. The zip export and adding sessions are tested with device types and power setups.
 - **Keeping copies in step:** [device-types/sync-copies.py](device-types/sync-copies.py) copies `device-types.json` into Classify, Process and the firmware editor (`--check` only reports).
 - **Not yet:** the visualizer has no device filter; the field sheet can't name a custom type's full description (only a type name or id).
 
